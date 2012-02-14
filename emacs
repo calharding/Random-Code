@@ -1,3 +1,6 @@
+;; Emacs configuration
+;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Emacs Load Path
 (add-to-list 'load-path "~/elisp")
 
