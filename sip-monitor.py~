@@ -1,12 +1,4 @@
 #!/usr/bin/python
-
-####################################################################
-# Monitoring script for an asterisk server. Notifies when the line #
-# registration drops for whatever reason.                          #
-#                                                                  #
-# Runs 'sip show registry', parses results, and sends email.       #
-####################################################################
-
 import os
 import subprocess
 import smtplib
