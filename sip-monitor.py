@@ -43,15 +43,14 @@ def sendEmail(mailFrom, mailTo, mailSubj, mailBody):
     msg['From'] = mailFrom
     msg['To'] = mailTo
 
-    # Send the mail using our own SMTP server, but do not include the
-    # envelope header.
+    # Send the mail using our own SMTP server
     s = smtplib.SMTP('localhost')
     s.sendmail(mailFrom, mailTo, msg.as_string())
     s.quit()
 
 
 
-def checkLastStatus():
+def checkPrevStatus():
     with open(statusFile) as f:
         content = f.readlines()
         status,count = content[0].split(',')
@@ -60,15 +59,15 @@ def checkLastStatus():
 
 
 
-def checkSIPStatus(testnum=1):
-    registrationOK=True
+def SIPCheckStatus(testnum=1):
+    registrOK=True
     global errormsg
     errormsg = ""
 
     SIPstatus = os.popen(asteriskExe + " -x 'sip show registry'").read().split('\n')
 
     if len(SIPstatus) < (sipNumLines+3):       # output incorrect
-        registrationOK = False
+        registrOK = False
         errormsg = "Not enough SIP lines detected. Expecting " + str(sipNumLines) + "\n"
         for line in SIPstatus:
             errormsg = errormsg + line + "\n"
@@ -80,29 +79,29 @@ def checkSIPStatus(testnum=1):
                 if words[4] != "Registered":
                     # SIP line NOT registered.
                     print words[2]+" is not registered. state="+words[4]
-                    registrationOK=False
+                    registrOK=False
                     errormsg=errormsg + line + "\n"
 
 
-    if registrationOK == False:
+    if registrOK == False:
         if testnum < 2:
             print "waiting... (" + str(testnum) + ")"
             time.sleep(retryDelay)
-            registrationOK = checkSIPStatus(testnum+1)
+            registrOK = SIPCheckStatus(testnum+1)
 
-    return registrationOK
+    return registrOK
 
 
 
 # check SIP status
-registrationOK=True
+registrOK=True
 errormsg=""
 
-registrationOK = checkSIPStatus()
-lastStatus = checkLastStatus()
+registrOK = SIPCheckStatus()
+lastStatus = checkPrevStatus()
 failCount = 0
 
-if registrationOK == False:     # Problems!
+if registrOK == False:     # Problems!
     print "SIP registration errors!"
 
     if lastStatus[0] == 'OK':
@@ -143,10 +142,9 @@ else:
     failCount = 0
 
 
-
 # save status
 f = open(statusFile,'w')
-if registrationOK == True:
+if registrOK == True:
     f.write("OK,"+str(failCount))
 else:
     f.write("FAIL,"+str(failCount))
