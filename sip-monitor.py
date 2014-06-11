@@ -64,7 +64,7 @@ def SIPCheckStatus(testnum=1):
     global errormsg
     errormsg = ""
 
-    SIPstatus = os.popen(asteriskExe + " -x 'sip show registry'").read().split('\n')
+    SIPstatus = os.popen(asteriskExe + " -rx 'sip show registry'").read().split('\n')
 
     if len(SIPstatus) < (sipNumLines+3):       # output incorrect
         registrOK = False
@@ -114,11 +114,11 @@ if registrOK == False:     # Problems!
     if failCount == 1:
         print 'sending failure notification'
         print "trying 'module reload'"
-        print os.popen(asteriskExe + " -x 'module reload'").read()
+        print os.popen(asteriskExe + " -rx 'module reload'").read()
         sendEmail(mailFrom,mailTo,mailSubj+': registration failed',errormsg + '\n\n sending command "module reload"')
     elif failCount == 2:
         print "trying 'core restart gracefully'"
-        print os.popen(asteriskExe + " -x 'core restart gracefully'").read()
+        print os.popen(asteriskExe + " -rx 'core restart gracefully'").read()
         sendEmail(mailFrom,mailTo,mailSubj+': registration failed ('+str(failCount)+')',errormsg + '\n\n sending command "core restart gracefully"')
     elif failCount == 10:
         sendEmail(mailFrom,mailTo,mailSubj+": registration failed ("+str(failCount)+")",errormsg)
